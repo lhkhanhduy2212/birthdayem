@@ -926,6 +926,9 @@
     </div>
 
     <audio id="ding" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"></audio>
+    <audio id="start-music" loop>
+        <source src="sound/sound-korean-birthday.mp3" type="audio/mpeg">
+    </audio>
     <audio id="bg-music" loop>
         <source src="" type="audio/mpeg">
         <!-- Add your background music source here -->
@@ -1134,6 +1137,14 @@
         function startHeartRain() { setInterval(createHeart, 300); }
 
         function startChat() {
+            // Play background music when starting chat
+            const startMusic = document.getElementById('start-music');
+            if (startMusic) {
+                startMusic.play().catch(err => {
+                    console.log('Could not play start music:', err);
+                });
+            }
+            
             document.getElementById('start-screen').style.opacity = '0';
             setTimeout(() => {
                 document.getElementById('start-screen').style.display = 'none';
