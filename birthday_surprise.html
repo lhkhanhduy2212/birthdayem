@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Sanrio Birthday Surprise 🎀</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Pacifico&family=Dancing+Script:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --pink-bg: #fff0f3;
+            --kitty-pink: #ff4d6d;
+            --melody-pink: #ff85a1;
+            --kuromi-purple: #7b2cbf;
+            --my-blue: #00b4d8;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: #000000;
+            font-family: 'Quicksand', sans-serif;
+            margin: 0; padding: 0; 
+            height: 100vh; height: 100dvh; /* Dynamic viewport height */
+            width: 100vw; width: 100dvw; /* Dynamic viewport width */
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+            /* Safe area cho iPhone notch/Dynamic Island */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Hiệu ứng Mưa Trái Tim */
+        .heart {
+            position: fixed; top: -20px; font-size: 20px;
+            z-index: 99; pointer-events: none;
+            animation: fall linear forwards;
+        }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+
+        /* Màn hình bắt đầu - Kawaii Sanrio Invitation Card */
+        #start-screen {
+            position: fixed; 
+            inset: 0; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            text-align: center;
+            overflow: hidden;
+            
+            /* Polka Dot Pattern Background */
+            background: #fff0f3;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.8) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+        }
+        
+        /* Floating Decorative Elements */
+        .floating-decoration {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 1;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .floating-decoration:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .floating-decoration:nth-child(2) {
+            top: 15%;
+            right: 10%;
+            animation-delay: 0.5s;
+            font-size: 35px;
+        }
+        
+        .floating-decoration:nth-child(3) {
+            bottom: 20%;
+            left: 15%;
+            animation-delay: 1s;
+            font-size: 45px;
+        }
+        
+        .floating-decoration:nth-child(4) {
+            bottom: 15%;
+            right: 12%;
+            animation-delay: 1.5s;
+            font-size: 38px;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+        
+        /* Main Content Container */
+        #start-screen .invitation-content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            padding: 30px;
+            max-width: 90%;
+        }
+        
+        /* Hello Kitty GIF */
+        #start-screen .kitty-gif {
+            max-width: 250px;
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.3),
+                        0 5px 15px rgba(255, 77, 109, 0.2);
+            background: white;
+            padding: 10px;
+            animation: gentleBounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes gentleBounce {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        /* Handwritten Style Text */
+        #start-screen .invitation-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #ff4d6d;
+            line-height: 1.4;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+        }
+        
+        /* CTA Button - Gradient with Pulse Animation */
+        .btn-start {
+            background: linear-gradient(135deg, #ff4d6d 0%, #ff1744 100%);
+            color: white; 
+            border: none;
+            padding: 18px 40px; 
+            border-radius: 50px; 
+            font-size: 1.2rem;
+            font-weight: bold; 
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: 0 10px 25px rgba(255, 77, 109, 0.4),
+                        0 5px 10px rgba(255, 77, 109, 0.3);
+            margin-top: 10px; 
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .btn-start:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(255, 77, 109, 0.5),
+                        0 8px 15px rgba(255, 77, 109, 0.4);
+        }
+        
+        .btn-start:active {
+            transform: scale(0.98);
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 10px 25px rgba(255, 77, 109, 0.4),
+                            0 5px 10px rgba(255, 77, 109, 0.3);
+            }
+            50% {
+                box-shadow: 0 10px 35px rgba(255, 77, 109, 0.6),
+                            0 5px 20px rgba(255, 77, 109, 0.5),
+                            0 0 40px rgba(255, 77, 109, 0.3);
+            }
+        }
+
+        /* Giao diện Messenger Style */
+        /* Messenger Intro */
+        #chat-app {
+            position: relative;
+            width: 375px;
+            height: 812px;
+            background: #000000;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header Messenger Style */
+        #chat-header {
+            padding: 10px 16px; background: #fff;
+            border-bottom: 1px solid #e4e6eb; 
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            z-index: 10;
+            min-height: 56px;
+        }
+        
+        .header-back {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .header-back:hover { background: #f0f2f5; }
+        .header-back svg {
+            width: 24px; height: 24px;
+            fill: var(--kitty-pink);
+        }
+        
+        .header-avatar {
+            width: 40px; height: 40px; 
+            border-radius: 50%; 
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        
+        .header-info {
+            flex: 1; min-width: 0;
+        }
+        
+        .header-name {
+            font-weight: 600; font-size: 0.9375rem;
+            color: #050505; line-height: 1.2;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        
+        .header-status {
+            font-size: 0.75rem; color: #65676b;
+            line-height: 1.2; margin-top: 2px;
+        }
+        
+        .header-actions {
+            display: flex; align-items: center; gap: 4px;
+        }
+        
+        .header-icon {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; cursor: pointer;
+            transition: background 0.2s;
+            color: var(--kitty-pink);
+        }
+        .header-icon:hover { background: rgba(255, 77, 109, 0.1); }
+        .header-icon svg {
+            width: 20px; height: 20px;
+            stroke: currentColor;
+        }
+        
+        .header-icon svg[fill] {
+            stroke: none;
+        }
+        
+        /* Video icon specific sizing */
+        .header-icon svg[viewBox="0 0 27 18"] {
+            width: 27px;
+            height: 18px;
+        }
+
+        /* Chat Body với Background Image - Messenger Style */
+        #chat-body {
+            flex: 1; padding: 16px 12px;
+            padding-bottom: 16px;
+            overflow-y: auto; overflow-x: hidden;
+            display: flex; flex-direction: column; gap: 4px;
+            position: relative;
+            background-color: #fff0f3; /* Fallback color */
+            background-image: url('img/background_mess.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        
+        /* Scrollbar styling */
+        #chat-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #chat-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        #chat-body::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+        
+        #chat-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Chat Messages Messenger Style */
+        .msg {
+            max-width: 75%; 
+            padding: 8px 12px; 
+            border-radius: 18px;
+            font-size: 0.9375rem; 
+            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            line-height: 1.33; 
+            position: relative;
+            word-wrap: break-word;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        @keyframes pop { 
+            from { opacity: 0; transform: scale(0.8) translateY(10px); } 
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .msg-wrapper {
+            display: flex; 
+            align-items: flex-start; 
+            gap: 8px;
+            margin-bottom: 4px;
+            width: 100%;
+            clear: both;
+        }
+        
+        .msg-wrapper.me {
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+        
+        .msg-wrapper:not(.me) {
+            justify-content: flex-start;
+        }
+        
+        .msg-avatar {
+            width: 24px; 
+            height: 24px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.8);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            margin-top: 2px; /* Align với top của text */
+        }
+        
+        /* Avatar ẩn/hiện được xử lý bởi JavaScript thông qua inline styles */
+        /* CSS này giữ không gian cho avatar ngay cả khi bị ẩn */
+
+        /* Tin nhắn của đối phương - Màu xám Messenger */
+        .kitty, .melody, .kuromi { 
+            background: #e4e6eb; 
+            color: #050505;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+        
+        /* Tin nhắn của mình - Màu xanh Messenger */
+        .me { 
+            background: #0084ff; 
+            color: #fff;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,132,255,0.3);
+        }
+        
+        .sender {
+            font-size: 0.6875rem; 
+            font-weight: 600; 
+            margin-bottom: 2px; 
+            display: block; 
+            opacity: 0.8;
+            color: #65676b;
+        }
+        
+        .me .sender {
+            display: none; /* Ẩn sender name cho tin nhắn của mình */
+        }
+        
+        /* Chỉ hiển thị sender cho tin nhắn đầu tiên của mỗi người */
+        /* Ẩn sender name cho tin nhắn không phải đầu tiên */
+        .msg-wrapper ~ .msg-wrapper:not(.me) .sender,
+        .msg-wrapper.me ~ .msg-wrapper.me .sender {
+            display: none;
+        }
+        
+        /* Emoji Reactions */
+        .msg-reactions {
+            display: flex; gap: 4px;
+            margin-top: 4px;
+            align-items: center;
+        }
+        
+        .reaction {
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .reaction:hover {
+            transform: scale(1.2);
+        }
+
+        /* Input Bar - iOS Messenger Style */
+        #chat-input {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 12px;
+            padding-bottom: max(8px, calc(env(safe-area-inset-bottom, 0) + 8px));
+            background: #fff;
+            border-top: 1px solid #e4e6eb;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+        
+        .input-icon-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex-shrink: 0;
+            background: transparent;
+            border: none;
+            padding: 0;
+        }
+        
+        .input-icon-btn:hover,
+        .input-icon-btn:active {
+            background: #f0f2f5;
+        }
+        
+        .input-icon-btn svg {
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            display: block;
+        }
+        
+        .input-icon-btn.blue {
+            color: var(--kitty-pink);
+        }
+        
+        .input-icon-btn.blue svg {
+            fill: var(--kitty-pink);
+        }
+        
+        /* Camera icon needs different sizing */
+        .input-icon-btn.blue svg[viewBox="0 0 25 22"] {
+            width: 25px;
+            height: 22px;
+        }
+        
+        /* Gallery icon needs different sizing */
+        .input-icon-btn.blue svg[viewBox="0 0 22 22"] {
+            width: 22px;
+            height: 22px;
+        }
+        
+        /* Microphone icon needs different sizing */
+        .input-icon-btn.blue svg[viewBox="0 0 19 24"] {
+            width: 19px;
+            height: 24px;
+        }
+        
+        .input-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: #f0f2f5;
+            border-radius: 20px;
+            padding: 8px 12px;
+            min-height: 36px;
+            cursor: text;
+            transition: background 0.2s;
+        }
+        
+        .input-container:active {
+            background: #e4e6eb;
+        }
+        
+        .input-placeholder {
+            color: #8a8d91;
+            font-size: 0.9375rem;
+            pointer-events: none;
+            user-select: none;
+            flex: 1;
+            text-align: left;
+            line-height: 1.33;
+            padding-right: 4px;
+        }
+        
+        .input-smiley {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-left: 8px;
+            padding: 2px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            border: none;
+            background: transparent;
+        }
+        
+        .input-smiley:hover,
+        .input-smiley:active {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        
+        .input-smiley svg {
+            width: 20px;
+            height: 20px;
+            stroke: #65676b;
+            fill: none;
+            pointer-events: none;
+        }
+        
+        .input-like-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+            flex-shrink: 0;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin-left: 4px;
+        }
+        
+        .input-like-btn:hover,
+        .input-like-btn:active {
+            background: #f0f2f5;
+        }
+        
+        .input-like-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .input-like-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+            pointer-events: none;
+        }
+        
+        .input-like-btn.theme {
+            color: var(--kitty-pink);
+        }
+        
+        .input-like-btn.blue {
+            color: var(--kitty-pink);
+        }
+        
+        /* Hidden input field for accessibility */
+        #message-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            width: 0;
+            height: 0;
+        }
+
+        /* Thông báo hệ thống */
+        .system-notification {
+            text-align: center; font-size: 0.75rem; color: #666;
+            margin: 12px auto; padding: 10px 15px; background: rgba(255,255,255,0.9);
+            border-radius: 15px; animation: fadeIn 0.6s forwards;
+            max-width: 85%; border: 1px solid rgba(123, 44, 191, 0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(-10px) scale(0.9); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+
+        /* Hộp quà & Voucher */
+        #gift-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            z-index: 2000; display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .gift-box {
+            width: 150px; cursor: pointer;
+            animation: wobble 1s infinite;
+        }
+        @keyframes wobble {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg) scale(1.1); }
+        }
+
+        .voucher-card {
+            width: 90%; max-width: 320px; background: white;
+            border-radius: 20px; padding: 25px; text-align: center;
+            border: 4px dashed var(--kitty-pink); display: none;
+            animation: zoomIn 0.5s forwards;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+        }
+        @keyframes zoomIn { from { transform: scale(0); } to { transform: scale(1); } }
+
+        .voucher-card h2 { color: var(--kitty-pink); margin-top: 0; }
+        .voucher-card p { font-size: 1.1rem; color: #555; }
+        .voucher-card .code { 
+            background: #ffe5ec; padding: 10px; border-radius: 10px;
+            font-weight: bold; color: var(--kitty-pink); display: block; margin: 15px 0;
+        }
+
+        /* End Screen - Happy Birthday Celebration */
+        #end-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #ffb3d9 0%, #ff85b3 50%, #ff4d6d 100%);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        }
+
+        #end-screen.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .end-screen-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            padding: 40px;
+            max-width: 90%;
+        }
+
+        .celebration-gif {
+            max-width: 280px;
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: celebrationBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes celebrationBounce {
+            0%, 100% {
+                transform: translateY(0px) scale(1);
+            }
+            50% {
+                transform: translateY(-15px) scale(1.05);
+            }
+        }
+
+        .birthday-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3),
+                         0 0 20px rgba(255, 255, 255, 0.5);
+            animation: titlePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .birthday-message {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: white;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            opacity: 0.95;
+        }
+
+        /* Media Queries cho iPhone Pro Max (6.9 inch, 1320 x 2868) */
+        @media screen and (min-width: 428px) and (min-height: 926px) {
+            /* iPhone 12 Pro Max và lớn hơn */
+            body {
+                font-size: 17px; /* Tăng font base cho màn hình lớn */
+            }
+            
+            #chat-app {
+                width: 375px;
+                height: 812px;
+            }
+            
+            #chat-header {
+                padding: 18px;
+            }
+            
+            #chat-header img {
+                width: 44px; height: 44px;
+            }
+            
+            #chat-body {
+                padding: 18px;
+            }
+            
+            .msg {
+                font-size: 1rem; padding: 14px 18px;
+                max-width: 80%;
+            }
+            
+            .system-notification {
+                font-size: 0.8rem; padding: 12px 18px;
+            }
+            
+            .btn-start {
+                padding: 20px 45px; font-size: 1.15rem;
+                min-height: 54px;
+            }
+            
+            #start-screen .kitty-gif {
+                max-width: 220px !important;
+            }
+            
+            #start-screen .invitation-text {
+                font-size: 1.6rem !important;
+            }
+            
+            .btn-start {
+                font-size: 1.1rem !important;
+                padding: 16px 35px !important;
+            }
+            
+            .floating-decoration {
+                font-size: 35px !important;
+            }
+            
+            .voucher-card {
+                max-width: 360px; padding: 30px;
+            }
+            
+            .voucher-card h2 {
+                font-size: 1.5rem;
+            }
+            
+            .voucher-card p {
+                font-size: 1.15rem;
+            }
+        }
+        
+        /* Tối ưu cho iPhone 17 Pro Max cụ thể (màn hình rất lớn) */
+        @media screen and (min-width: 430px) and (min-height: 932px) {
+            #chat-app {
+                width: 375px;
+                height: 812px;
+            }
+        }
+        
+        /* Tối ưu cho màn hình độ phân giải cao (460+ ppi) */
+        @media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 460dpi) {
+            * {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+            
+            .msg, .btn-start {
+                text-rendering: optimizeLegibility;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="start-screen">
+        <!-- Floating Decorative Elements -->
+        <div class="floating-decoration">🎀</div>
+        <div class="floating-decoration">💖</div>
+        <div class="floating-decoration">🌸</div>
+        <div class="floating-decoration">💕</div>
+        
+        <!-- Main Invitation Content -->
+        <div class="invitation-content">
+            <img src="img/hello-kitty.gif" 
+                 alt="Hello Kitty Cute" 
+                 class="kitty-gif"
+                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/763/763748.png'">
+            <p class="invitation-text">Cậu có một thông báo mới từ Sanrio! ✨</p>
+            <button class="btn-start" onclick="startChat()">Bấm để xem tin nhắn bí mật</button>
+        </div>
+    </div>
+
+    <div id="chat-app">
+        <div id="chat-header">
+            <div class="header-back">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+            </div>
+            <img src="img/avatar_hellokitty.jpg" alt="Hello Kitty" class="header-avatar" onerror="this.src='https://i.pinimg.com/736x/d6/7e/44/d67e44383434676be3685c2759e6912b.jpg'">
+            <div class="header-info">
+                <div class="header-name">Hội Chị Em Sanrio 🎀</div>
+                <div class="header-status">Đang hoạt động...</div>
+            </div>
+            <div class="header-actions">
+                <div class="header-icon">
+                    <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.37815 13.4919L9.5081 13.6218C11.7457 15.7882 13.6184 16.8056 15.1261 16.674L15.5605 16.2687C16.1785 15.7064 16.6444 15.35 16.9584 15.1994C17.612 14.8859 18.0707 14.8922 19.3094 15.5625C20.939 16.4442 22.0642 17.4691 22.6392 18.0441C23.1731 18.578 23.0072 19.4977 22.8197 19.9057L22.6955 20.1333C22.3619 20.7129 21.1521 22.6249 18.8334 22.9521C17.9523 23.0764 16.8399 22.9624 15.5357 22.5696C12.7419 21.6024 9.95981 19.8297 7.18932 17.2514L6.69661 16.7834L6.69197 16.788L6.45419 16.546L6.21199 16.308L6.21664 16.3034L5.74857 15.8107C3.17035 13.0402 1.39763 10.2581 0.430416 7.46428C0.0376067 6.16006 -0.0763732 5.04772 0.047946 4.16655C0.39822 1.68383 2.56566 0.472407 2.96871 0.246715L3.00964 0.223616C3.35849 0.0224473 4.38095 -0.214146 4.95591 0.360816L5.22814 0.640783C5.82079 1.26756 6.68177 2.29378 7.43755 3.69059C8.1078 4.92934 8.11405 5.38801 7.80058 6.04161C7.61655 6.42534 7.125 7.03612 6.32595 7.87394C6.19439 9.38161 7.21179 11.2543 9.37815 13.4919Z" fill="#ff4d6d"/>
+                    </svg>
+                </div>
+                <div class="header-icon">
+                    <svg width="27" height="18" viewBox="0 0 27 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15.2 0C17.2987 0 19 1.7269 19 3.85714V14.1429C19 16.2731 17.2987 18 15.2 18H3.8C1.70132 18 0 16.2731 0 14.1429V3.85714C0 1.7269 1.70132 0 3.8 0H15.2ZM26.8658 4.02231C26.9538 4.17312 27 4.34278 27 4.5153V13.4849C27 14.0455 26.5224 14.5 25.9333 14.5C25.7521 14.5 25.5738 14.456 25.4153 14.3723L21.6858 12.4005C21.2625 12.1767 21 11.7521 21 11.2912V6.70894C21 6.24812 21.2625 5.82352 21.6858 5.59973L25.4153 3.62793C25.9303 3.35566 26.5797 3.53224 26.8658 4.02231Z" fill="#ff4d6d"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div id="chat-body">
+            <div style="text-align: center; font-size: 0.75rem; color: #65676b; margin: 8px 0; padding: 8px; background: rgba(255,255,255,0.6); border-radius: 12px; backdrop-filter: blur(10px);">Hôm nay là ngày đặc biệt của cậu! ✨</div>
+        </div>
+        <div id="chat-input">
+            <!-- Left Icons - Messenger Pink (#ff4d6d) -->
+            <button class="input-icon-btn blue" type="button" aria-label="More options">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4 12C6.20914 12 8 13.7909 8 16C8 18.2091 6.20914 20 4 20C1.79086 20 0 18.2091 0 16C0 13.7909 1.79086 12 4 12ZM16 12C18.2091 12 20 13.7909 20 16C20 18.2091 18.2091 20 16 20C13.7909 20 12 18.2091 12 16C12 13.7909 13.7909 12 16 12ZM4 0C6.20914 0 8 1.79086 8 4C8 6.20914 6.20914 8 4 8C1.79086 8 0 6.20914 0 4C0 1.79086 1.79086 0 4 0ZM16 0C18.2091 0 20 1.79086 20 4C20 6.20914 18.2091 8 16 8C13.7909 8 12 6.20914 12 4C12 1.79086 13.7909 0 16 0Z" fill="#ff4d6d"/>
+                </svg>
+            </button>
+            <button class="input-icon-btn blue" type="button" aria-label="Camera">
+                <svg width="25" height="22" viewBox="0 0 25 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M14.6225 0C15.2671 0 15.888 0.241512 16.3617 0.676443L18.0133 2.19312C18.4278 2.57369 18.955 2.80617 19.5122 2.85834L19.7525 2.86957H20.5128C22.991 2.86957 25 4.86806 25 7.33333V17.5362C25 20.0015 22.991 22 20.5128 22H4.48718C2.00898 22 0 20.0015 0 17.5362V7.33333C0 4.86806 2.00898 2.86957 4.48718 2.86957H5.24748C5.89207 2.86957 6.51301 2.62805 6.98666 2.19312L8.63834 0.676443C9.11199 0.241512 9.73293 0 10.3775 0H14.6225ZM12.5 5.5C8.91015 5.5 6 8.41015 6 12C6 15.5899 8.91015 18.5 12.5 18.5C16.0899 18.5 19 15.5899 19 12C19 8.41015 16.0899 5.5 12.5 5.5ZM12.5 7.5C14.9853 7.5 17 9.51472 17 12C17 14.4853 14.9853 16.5 12.5 16.5C10.0147 16.5 8 14.4853 8 12C8 9.51472 10.0147 7.5 12.5 7.5Z" fill="#ff4d6d"/>
+                </svg>
+            </button>
+            <button class="input-icon-btn blue" type="button" aria-label="Gallery">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M18 0C20.2091 0 22 1.79086 22 4V18C22 20.2091 20.2091 22 18 22H4C1.79086 22 0 20.2091 0 18V4C0 1.79086 1.79086 0 4 0H18ZM18 2H4C2.89543 2 2 2.89543 2 4V14.4655C2 14.5759 2.08954 14.6655 2.2 14.6655C2.23122 14.6655 2.26201 14.6582 2.2899 14.6441L8.3036 11.618C9.9999 10.7641 12.0003 10.7636 13.697 11.6168L19.7102 14.6403C19.8088 14.6899 19.9291 14.6501 19.9787 14.5514C19.9927 14.5236 20 14.4928 20 14.4616V4C20 2.89543 19.1046 2 18 2ZM6.5 4C7.88071 4 9 5.11929 9 6.5C9 7.88071 7.88071 9 6.5 9C5.11929 9 4 7.88071 4 6.5C4 5.11929 5.11929 4 6.5 4Z" fill="#ff4d6d"/>
+                </svg>
+            </button>
+            <button class="input-icon-btn blue" type="button" aria-label="Microphone">
+                <svg width="19" height="24" viewBox="0 0 19 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.99935 22H12.9993C13.5516 22 13.9993 22.4477 13.9993 23C13.9993 23.5128 13.6133 23.9355 13.116 23.9933L12.9993 24H4.99935C4.44706 24 3.99935 23.5523 3.99935 23C3.99935 22.4872 4.38539 22.0645 4.88273 22.0067L4.99935 22H12.9993H4.99935ZM17.1005 10.6035C17.6525 10.6197 18.0869 11.0804 18.0707 11.6324C18.0287 13.0647 17.5706 14.5824 16.7935 15.9284C14.3082 20.233 8.8039 21.7079 4.49927 19.2226C1.74573 17.6329 0.0713574 14.7458 0.000264759 11.6258C-0.0123168 11.0737 0.425083 10.6159 0.977224 10.6033C1.52937 10.5907 1.98716 11.0281 1.99975 11.5803C2.05509 14.0091 3.35676 16.2536 5.49927 17.4906C8.84731 19.4236 13.1284 18.2764 15.0614 14.9284C15.6783 13.86 16.0396 12.6628 16.0716 11.5737C16.0878 11.0217 16.5484 10.5873 17.1005 10.6035ZM8.99935 0C11.7608 0 13.9993 2.23858 13.9993 5V11.5C13.9993 14.2614 11.7608 16.5 8.99935 16.5C6.23792 16.5 3.99935 14.2614 3.99935 11.5V5C3.99935 2.23858 6.23792 0 8.99935 0Z" fill="#ff4d6d"/>
+                </svg>
+            </button>
+            
+            <!-- Input Field Container - Pill Shape -->
+            <div class="input-container">
+                <span class="input-placeholder">Aa</span>
+                <button class="input-smiley" type="button" aria-label="Emoji">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Right Icon - Heart (Theme Color/Pink) -->
+            <button class="input-like-btn theme" type="button" aria-label="Like">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            </button>
+            
+            <!-- Hidden input for form submission -->
+            <input type="text" id="message-input" style="display: none;">
+        </div>
+    </div>
+
+    <div id="gift-overlay">
+        <img id="gift-box-img" class="gift-box" src="https://cdn-icons-png.flaticon.com/512/4213/4213958.png" alt="Gift" onclick="openVoucher()">
+        <p id="gift-hint" style="color: white; margin-top: 20px; font-weight: bold;">Chạm vào hộp quà để mở bất ngờ! 🎁</p>
+
+        <div id="voucher" class="voucher-card">
+            <h2>VOUCHER TÌNH YÊU 🎀</h2>
+            <p>Chúc mừng sinh nhật công chúa! Tấm thẻ này có giá trị đổi được:</p>
+            <span class="code">MỘT BUỔI HẸN HÒ THEO Ý EMM ✨</span>
+            <p style="font-size: 0.8rem;">*Có giá trị vĩnh viễn với người yêu của emmm*</p>
+            <button class="btn-start" style="padding: 10px 20px; font-size: 0.9rem;" onclick="finishCelebration()">Nhận quà xong rồi! ❤️</button>
+        </div>
+    </div>
+
+    <!-- End Screen - Happy Birthday Celebration -->
+    <div id="end-screen">
+        <div class="end-screen-content">
+            <img src="img/hello-kitty-birthday.gif" alt="Hello Kitty Birthday Celebration" class="celebration-gif" onerror="this.src='img/hello-kitty.gif'">
+            <h1 class="birthday-title">Happy Birthday! 🎉</h1>
+            <p class="birthday-message">Anh bí ẩn chúc em có mụt ngày sinh nhật thật là duii bên bạn bè cám ơn em đã xem hết tin nhắn của anh. Chúc em sinh nhật thiệt là dui dẻ nhee  💖</p>
+        </div>
+    </div>
+
+    <audio id="ding" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"></audio>
+    <audio id="bg-music" loop>
+        <source src="" type="audio/mpeg">
+        <!-- Add your background music source here -->
+    </audio>
+
+    <script>
+        const chatBody = document.getElementById('chat-body');
+        const ding = document.getElementById('ding');
+
+        const messages = [
+            { sender: 'Hello Kitty 🎀', text: 'Chúc mừng sinh nhật bạn thân nhất! Tớ có món quà nhỏ cho cậu nè... 🎂', type: 'kitty', avatar: 'img/avatar_hellokitty.jpg', isSystem: false },
+            { sender: 'My Melody 🌸', text: 'Chúc cậu luôn ngọt ngào và hạnh phúc nhé! Moahhhhhh! 💋', type: 'melody', avatar: 'img/avatar_mymelody.jpg', isSystem: false },
+            { sender: 'Kuromi 😈', text: 'Khoan đã, để tớ thêm một người đặc biệt vào nhóm nhé! 💜', type: 'kuromi', avatar: 'img/avatar_kuromi.jpg', isSystem: false },
+            { sender: 'Hệ thống', text: 'Kuromi đã thêm Anh bí ẩn vào nhóm', type: 'system', avatar: '', isSystem: true },
+            { sender: 'Anh bí ẩn 💖', text: 'Chúc mừng sinh nhật em yêu! Anh có một món quà đặc biệt muốn dành cho em ngay bây giờ...', type: 'kuromi', avatar: '', isSystem: false }
+        ];
+
+
+        let lastSender = null; // Track last sender for alignment
+        
+        function playSequence(index) {
+            if (index < messages.length) {
+                setTimeout(() => {
+                    const msg = messages[index];
+                    
+                    if (msg.isSystem) {
+                        // Thông báo hệ thống
+                        const div = document.createElement('div');
+                        div.className = 'system-notification';
+                        div.innerHTML = msg.text;
+                        chatBody.appendChild(div);
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                        lastSender = null; // Reset sender after system message
+                        
+                        // Tiếp tục với tin nhắn tiếp theo sau một chút delay
+                        setTimeout(() => playSequence(index + 1), 1500);
+                    } else {
+                        // Tin nhắn thường - Messenger Style
+                        const wrapper = document.createElement('div');
+                        wrapper.className = `msg-wrapper ${msg.type === 'me' ? 'me' : ''}`;
+                        
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = `msg ${msg.type}`;
+                        
+                        // Kiểm tra nếu tin nhắn này từ cùng sender như tin nhắn trước (dựa trên messages array)
+                        const prevMsg = index > 0 ? messages[index - 1] : null;
+                        const isConsecutiveFromSameSender = (msg.type !== 'me') && (prevMsg && !prevMsg.isSystem && prevMsg.sender === msg.sender);
+                        
+                        // Luôn tạo avatar placeholder cho tin nhắn không phải của mình để giữ alignment
+                        if (msg.type !== 'me') {
+                            const avatarImg = document.createElement('img');
+                            if (msg.avatar) {
+                                avatarImg.src = msg.avatar;
+                                avatarImg.alt = msg.sender;
+                                // Fallback URLs online nếu file local không tồn tại
+                                let fallbackUrl = 'https://i.pinimg.com/736x/d6/7e/44/d67e44383434676be3685c2759e6912b.jpg'; // Default fallback
+                                if (msg.type === 'kitty') {
+                                    fallbackUrl = 'https://i.pinimg.com/736x/d6/7e/44/d67e44383434676be3685c2759e6912b.jpg';
+                                } else if (msg.type === 'melody') {
+                                    fallbackUrl = 'https://i.pinimg.com/564x/5c/82/93/5c82931e5d4c4e8b5c5c5c5c5c5c5c5c5.jpg';
+                                } else if (msg.type === 'kuromi') {
+                                    fallbackUrl = 'https://i.pinimg.com/564x/5c/82/93/5c82931e5d4c4e8b5c5c5c5c5c5c5c5c5.jpg';
+                                }
+                                avatarImg.onerror = function() { this.src = fallbackUrl; };
+                            } else {
+                                // Tạo một transparent placeholder nếu không có avatar
+                                avatarImg.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48L3N2Zz4=';
+                                avatarImg.alt = '';
+                            }
+                            avatarImg.className = 'msg-avatar';
+                            
+                            // Ẩn avatar nếu tin nhắn liên tiếp từ cùng sender
+                            if (isConsecutiveFromSameSender) {
+                                avatarImg.style.visibility = 'hidden';
+                                avatarImg.style.opacity = '0';
+                            }
+                            
+                            wrapper.appendChild(avatarImg);
+                        }
+                        
+                        // Ẩn sender name nếu tin nhắn liên tiếp từ cùng sender
+                        if (isConsecutiveFromSameSender && msg.type !== 'me') {
+                            msgDiv.innerHTML = msg.text; // Không hiển thị sender name
+                        } else {
+                            msgDiv.innerHTML = `<span class="sender">${msg.sender}</span>${msg.text}`;
+                        }
+                        
+                        // Cập nhật lastSender sau khi tạo message
+                        if (msg.type === 'me') {
+                            lastSender = null; // Reset for me messages
+                        } else {
+                            lastSender = msg.sender; // Update last sender
+                        }
+                        
+                        wrapper.appendChild(msgDiv);
+                        chatBody.appendChild(wrapper);
+                        
+                        ding.currentTime = 0; ding.play();
+                        chatBody.scrollTop = chatBody.scrollHeight;
+
+                        if (index === messages.length - 1) {
+                            // Hiện hộp quà sau khi tin nhắn cuối xong 2s
+                            setTimeout(showGiftBox, 2000);
+                        } else {
+                            playSequence(index + 1);
+                        }
+                    }
+                }, index === 0 ? 800 : (messages[index].isSystem ? 1500 : 2500));
+            }
+        }
+
+        function showGiftBox() {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff4d6d', '#ffffff'] });
+            document.getElementById('gift-overlay').style.display = 'flex';
+        }
+
+        function openVoucher() {
+            document.getElementById('gift-box-img').style.display = 'none';
+            document.getElementById('gift-hint').style.display = 'none';
+            document.getElementById('voucher').style.display = 'block';
+            
+            // Nổ pháo hoa thêm lần nữa khi mở voucher
+            confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 } });
+        }
+
+        function finishCelebration() {
+            const giftOverlay = document.getElementById('gift-overlay');
+            const voucher = document.getElementById('voucher');
+            const endScreen = document.getElementById('end-screen');
+            const bgMusic = document.getElementById('bg-music');
+            
+            // 1. Hide voucher modal smoothly with fade out
+            voucher.style.opacity = '0';
+            voucher.style.transition = 'opacity 0.5s ease-in-out';
+            
+            setTimeout(() => {
+                giftOverlay.style.opacity = '0';
+                giftOverlay.style.transition = 'opacity 0.5s ease-in-out';
+                
+                setTimeout(() => {
+                    giftOverlay.style.display = 'none';
+                    voucher.style.display = 'none';
+                    
+                    // 2. Reveal end-screen with fade in
+                    endScreen.classList.add('show');
+                    
+                    // 3. Play background music
+                    if (bgMusic) {
+                        bgMusic.currentTime = 0;
+                        bgMusic.play().catch(err => {
+                            console.log('Could not play background music:', err);
+                        });
+                    }
+                    
+                    // 4. Trigger confetti loop for 15 seconds
+                    let confettiInterval = setInterval(() => {
+                        // Main confetti burst from random positions
+                        confetti({
+                            particleCount: 100,
+                            spread: 70,
+                            origin: { 
+                                x: Math.random(),
+                                y: Math.random() * 0.6 + 0.2
+                            },
+                            colors: ['#ff4d6d', '#ff85b3', '#ffb3d9', '#ffffff', '#ffb6c1'],
+                            shapes: ['circle', 'square']
+                        });
+                        
+                        // Additional burst from left side
+                        confetti({
+                            particleCount: 50,
+                            angle: 60,
+                            spread: 55,
+                            origin: { x: 0 },
+                            colors: ['#ff4d6d', '#ffffff', '#ffb3d9']
+                        });
+                        
+                        // Additional burst from right side
+                        confetti({
+                            particleCount: 50,
+                            angle: 120,
+                            spread: 55,
+                            origin: { x: 1 },
+                            colors: ['#ff4d6d', '#ffffff', '#ffb3d9']
+                        });
+                    }, 500); // Every 500ms
+                    
+                    // Stop confetti after 15 seconds
+                    setTimeout(() => {
+                        clearInterval(confettiInterval);
+                    }, 15000);
+                }, 500);
+            }, 300);
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = ['💖','💗','🌸','🎀','🍎'][Math.floor(Math.random() * 5)];
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.animationDuration = Math.random() * 3 + 2 + "s";
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }
+
+        function startHeartRain() { setInterval(createHeart, 300); }
+
+        function startChat() {
+            document.getElementById('start-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('start-screen').style.display = 'none';
+                playSequence(0);
+                startHeartRain();
+            }, 500);
+        }
+    </script>
+</body>
+</html>
+
